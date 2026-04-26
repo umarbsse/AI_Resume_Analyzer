@@ -38,14 +38,30 @@ public function analyze_resume(Request $request)
         ]);
 
         // Run Python AI
-        $python = "C:\Users\John\AppData\Local\Programs\Python\Python314\python.exe";
-        $script = base_path('python/analyze_resume.py');
-        $command = "$python $script $id";
+     //   $python = "C:\Users\John\AppData\Local\Programs\Python\Python314\python.exe";
+     //   $script = base_path('python/analyze_resume.py');
+    //    $command = "$python $script $id";
+        //echo $command;
+
+    //    exec($command);
+
+    $python = "C:\\Users\\John\\AppData\\Local\\Programs\\Python\\Python314\\python.exe";
+    $script = base_path('python/main.py'); // updated to main.py (your new structure)
+
+    $id = (int) $id; // safety
+
+    // Optional: log file to debug Python output
+    $logFile = storage_path('logs/python.log');
+
+    // Full command (async + logging)
+    $command = "start /B \"\" \"$python\" \"$script\" $id > \"$logFile\" 2>&1";
+
+    // Execute async
+    pclose(popen($command, "r"));
+
 
 
         
-
-        exec("$python $script $id");
 
         return back()->with('success', 'Resume uploaded and analyzed!');
     }

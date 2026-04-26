@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('file_path');
             $table->string('original_filename');
+            $table->text('resume_text')->nullable();
             $table->text('job_description');
             
             // AI Feedback Fields
