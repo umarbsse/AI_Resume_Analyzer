@@ -15,7 +15,7 @@ def get_resume_by_id(resume_id):
         cursor = conn.cursor()
 
         cursor.execute(
-            "SELECT file_path FROM resume_analyzer WHERE id=%s",
+            "SELECT file_path, job_description, resume_text FROM resume_analyzer WHERE id=%s",
             (resume_id,)
         )
 
