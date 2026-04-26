@@ -48,3 +48,20 @@ def update_resume_text(resume_id, text):
 
     except Exception as e:
         logger.error(f"DB update error: {str(e)}")
+
+def insert_log(resume_id, level, message):
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        query = """
+            INSERT INTO python_logs (resume_id, level, message, created_at, updated_at)
+            VALUES (%s, %s, %s, NOW(), NOW())
+        """
+
+        cursor.execute(query, (resume_id, level, message))
+        conn.commit()
+        conn.close()
+
+    except Exception as e:
+        print("DB Log Error:", str(e))
