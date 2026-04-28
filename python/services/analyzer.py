@@ -6,91 +6,78 @@ from db import get_connection
 # ANALYZE RESUME VS JOB DESCRIPTION
 # =====================================================
 
-import re
-
 def analyze_resume_text(resume_text, job_description):
 
     # -----------------------------------------------------
-    # CLEANING
+    # SAFE CLEANING
     # -----------------------------------------------------
     resume_text = (resume_text or "").strip()
     job_description = (job_description or "").strip()
 
-    if not resume_text or not job_description:
+    if resume_text == "" or job_description == "":
         return {
             "match_score": 0,
-            "strengths": "Missing input",
-            "improvements": "Provide resume and job description",
-            "suggestions": "Check input"
+            "strengths": "Resume or job description missing in analysis input",
+            "improvements": "Ensure resume_text and job_description are stored in DB",
+            "suggestions": "Check DB data insertion flow"
         }
 
+    # -----------------------------------------------------
+    # LOWERCASE
+    # -----------------------------------------------------
     resume_text_lower = resume_text.lower()
     job_text_lower = job_description.lower()
 
     # -----------------------------------------------------
-    # STOPWORDS (IMPORTANT)
+    # STEP 1: GET ALL TECH KEYWORDS
     # -----------------------------------------------------
-    stopwords = {
-        "the","and","for","with","you","your","are","this","that",
-        "have","will","our","from","they","their","job","role",
-        "experience","required","skills","ability","work"
-    }
+    tech_keywords = get_tech_keywords()
+    tech_keywords_set = set([kw.lower() for kw in tech_keywords])
 
     # -----------------------------------------------------
-    # STEP 1: EXTRACT JOB KEYWORDS (NOT ONLY TECH)
+    # STEP 2: EXTRACT KEYWORDS FROM JOB DESCRIPTION
     # -----------------------------------------------------
-    job_words = re.findall(r'\b[a-zA-Z]{3,}\b', job_text_lower)
+    job_words = set(re.findall(r'\b[a-zA-Z]{3,}\b', job_text_lower))
 
-    job_keywords = [
-        word for word in job_words
-        if word not in stopwords
-    ]
-
-    # remove duplicates
-    job_keywords = list(set(job_keywords))
-
-    # LIMIT to avoid noise
-    job_keywords = job_keywords[:30]
+    # Only keep TECH-related keywords from job description
+    job_keywords = [kw for kw in job_words if kw in tech_keywords_set]
 
     # -----------------------------------------------------
-    # STEP 2: MATCH WITH RESUME
+    # STEP 3: FIND MATCHED + MISSING IN RESUME
     # -----------------------------------------------------
     matched_keywords = [kw for kw in job_keywords if kw in resume_text_lower]
     missing_keywords = [kw for kw in job_keywords if kw not in resume_text_lower]
 
     # -----------------------------------------------------
-    # STEP 3: SCORE (FIXED)
+    # STEP 4: MATCH SCORE
     # -----------------------------------------------------
-    if len(job_keywords) < 5:
-        # avoid fake 100% when too few keywords
-        match_score = int((len(matched_keywords) / max(len(job_keywords),1)) * 60)
+    if len(job_keywords) == 0:
+        match_score = 0
     else:
         match_score = int((len(matched_keywords) / len(job_keywords)) * 100)
 
     # -----------------------------------------------------
-    # STEP 4: INSIGHTS
+    # STEP 5: INSIGHTS
     # -----------------------------------------------------
     strengths = []
     improvements = []
     suggestions = []
 
     # Strengths
-    if match_score >= 75:
-        strengths.append("Strong alignment with job description")
+    if match_score >= 70:
+        strengths.append("Strong match with job description")
     elif match_score >= 40:
-        strengths.append("Moderate alignment with job description")
+        strengths.append("Moderate match with job description")
     else:
-        improvements.append("Low alignment with job description")
+        improvements.append("Low keyword match with job description")
 
-    # Always show matched skills
+    # Add matched skills
     if matched_keywords:
-        strengths.append("Matched keywords: " + ", ".join(matched_keywords[:10]))
+        strengths.append("Matched skills: " + ", ".join(matched_keywords[:10]))
 
-    # Always show missing skills
+    # Missing skills
     if missing_keywords:
-        improvements.append("Missing keywords: " + ", ".join(missing_keywords[:10]))
-    else:
-        improvements.append("Add more relevant keywords to strengthen profile")
+        improvements.append("Missing skills: " + ", ".join(missing_keywords[:10]))
 
     # Resume quality checks
     if "project" not in resume_text_lower:
@@ -99,17 +86,18 @@ def analyze_resume_text(resume_text, job_description):
     if len(resume_text.split()) < 200:
         improvements.append("Resume content is too short")
 
-    # Suggestions (ALWAYS GENERATED)
-    suggestions.append("Tailor resume to match job description keywords")
+    # Suggestions
+    if match_score < 50:
+        suggestions.append("Improve keyword alignment with job description")
+
+    if match_score < 70:
+        suggestions.append("Customize resume based on job requirements")
 
     if missing_keywords:
-        suggestions.append("Include missing skills if you have experience")
+        suggestions.append("Add missing skills if you have experience")
 
-    if match_score < 60:
-        suggestions.append("Improve keyword alignment for better ATS score")
-
-    if match_score > 85:
-        suggestions.append("Consider adding measurable achievements")
+    if not strengths:
+        strengths.append("Basic resume structure detected")
 
     # -----------------------------------------------------
     # FINAL RETURN
