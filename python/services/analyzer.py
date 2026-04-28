@@ -5,6 +5,7 @@ from db import get_connection
 # =====================================================
 # ANALYZE RESUME VS JOB DESCRIPTION
 # =====================================================
+
 def analyze_resume_text(resume_text, job_description):
 
     # -----------------------------------------------------
@@ -63,7 +64,7 @@ def analyze_resume_text(resume_text, job_description):
         improvements.append("Low keyword match with job description")
 
     # Tech detection
-    tech_keywords = ["python", "laravel", "php", "node", "react", "mysql"]
+    tech_keywords = get_tech_keywords()
 
     for tech in tech_keywords:
         if tech in resume_text_lower:
@@ -95,6 +96,139 @@ def analyze_resume_text(resume_text, job_description):
         "improvements": ", ".join(improvements),
         "suggestions": ", ".join(suggestions)
     }
+
+
+# =====================================================
+# Keywords to look for in job descriptions and resumes
+# =====================================================
+def get_tech_keywords():
+    return [
+
+                    # -----------------------------
+                    # Programming Languages
+                    # -----------------------------
+                    "python","java","javascript","typescript","c","c++","c#","go","golang","rust",
+                    "kotlin","swift","dart","ruby","php","scala","perl","r","matlab","haskell",
+                    "objective-c","elixir","clojure","groovy","f#","assembly","bash","powershell",
+
+                    # -----------------------------
+                    # Backend Frameworks
+                    # -----------------------------
+                    "django","flask","fastapi","spring","spring boot","micronaut","quarkus",
+                    "express","nestjs","koa","hapi","asp.net","asp.net core","laravel",
+                    "symfony","codeigniter","adonisjs","sails","phoenix",
+
+                    # -----------------------------
+                    # Frontend Frameworks / UI
+                    # -----------------------------
+                    "react","nextjs","vue","nuxt","angular","svelte","ember","backbone",
+                    "jquery","redux","zustand","mobx","vite","webpack","babel",
+                    "html","html5","css","css3","sass","scss","less","bootstrap","tailwind",
+                    "material ui","chakra ui","ant design",
+
+                    # -----------------------------
+                    # Mobile / Cross Platform
+                    # -----------------------------
+                    "android","ios","react native","flutter","xamarin","ionic","swiftui",
+                    "jetpack compose","cordova","capacitor",
+
+                    # -----------------------------
+                    # Databases (SQL/NoSQL)
+                    # -----------------------------
+                    "mysql","postgresql","postgres","sqlite","mariadb","oracle","sql server",
+                    "mongodb","cassandra","dynamodb","redis","memcached","neo4j",
+                    "elasticsearch","opensearch","firebase","supabase","cockroachdb","timescaledb",
+
+                    # -----------------------------
+                    # Cloud / DevOps
+                    # -----------------------------
+                    "aws","amazon web services","azure","gcp","google cloud","digitalocean",
+                    "linode","heroku","vercel","netlify",
+                    "docker","kubernetes","helm","openshift","nomad",
+                    "terraform","pulumi","ansible","chef","puppet",
+                    "jenkins","github actions","gitlab ci","circleci","travis ci",
+                    "nginx","apache","caddy",
+
+                    # -----------------------------
+                    # Data / AI / ML
+                    # -----------------------------
+                    "machine learning","deep learning","ai","artificial intelligence",
+                    "tensorflow","pytorch","keras","scikit-learn","xgboost","lightgbm",
+                    "pandas","numpy","matplotlib","seaborn","opencv","nlp","spacy",
+                    "huggingface","transformers","llm","gpt","bert",
+                    "data analysis","data science","data engineering",
+                    "spark","apache spark","hadoop","hive","airflow","dbt",
+
+                    # -----------------------------
+                    # APIs & Integration
+                    # -----------------------------
+                    "rest","rest api","graphql","grpc","soap","websocket",
+                    "openapi","swagger","postman","insomnia",
+
+                    # -----------------------------
+                    # Testing
+                    # -----------------------------
+                    "unit testing","integration testing","e2e testing","tdd","bdd",
+                    "selenium","cypress","playwright","jest","mocha","chai",
+                    "junit","pytest","phpunit","karma","vitest",
+
+                    # -----------------------------
+                    # Version Control / Collaboration
+                    # -----------------------------
+                    "git","github","gitlab","bitbucket","svn",
+
+                    # -----------------------------
+                    # Security
+                    # -----------------------------
+                    "oauth","oauth2","jwt","saml","openid","encryption","ssl","tls",
+                    "owasp","xss","csrf","sql injection","penetration testing","pentesting",
+                    "security","cybersecurity","iam","zero trust",
+
+                    # -----------------------------
+                    # Architecture / Patterns
+                    # -----------------------------
+                    "microservices","monolith","event driven","soa","mvc","mvvm",
+                    "clean architecture","hexagonal architecture","ddd","cqrs",
+                    "design patterns","singleton","factory","observer",
+
+                    # -----------------------------
+                    # Messaging / Streaming
+                    # -----------------------------
+                    "kafka","rabbitmq","activemq","nats","redis streams","pubsub",
+
+                    # -----------------------------
+                    # Containers / Orchestration
+                    # -----------------------------
+                    "containerization","docker compose","kubernetes","k8s","helm charts",
+
+                    # -----------------------------
+                    # Operating Systems / Infra
+                    # -----------------------------
+                    "linux","ubuntu","debian","centos","windows","macos","unix",
+
+                    # -----------------------------
+                    # Build / Package Managers
+                    # -----------------------------
+                    "npm","yarn","pnpm","pip","poetry","maven","gradle","composer","nuget",
+
+                    # -----------------------------
+                    # CMS / E-commerce
+                    # -----------------------------
+                    "wordpress","drupal","joomla","shopify","magento","woocommerce",
+
+                    # -----------------------------
+                    # Analytics / Monitoring
+                    # -----------------------------
+                    "prometheus","grafana","elk","elastic stack","logstash","kibana",
+                    "datadog","new relic","sentry",
+
+                    # -----------------------------
+                    # Misc / Productivity
+                    # -----------------------------
+                    "jira","confluence","agile","scrum","kanban","ci/cd","devops",
+                    "debugging","optimization","performance tuning"
+        ]
+
 
 
 # =====================================================

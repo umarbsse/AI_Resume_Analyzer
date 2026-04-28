@@ -8,64 +8,41 @@ use Illuminate\Support\Facades\Storage;
 
 class Ai extends Controller
 {
-public function analyze_resume(Request $request)
-{
-    $request->validate([
-        'resume' => 'required|mimes:pdf|max:5120',
-        'job_description' => 'required|string',
-    ]);
-
-    if ($request->hasFile('resume')) {
-
-        $file = $request->file('resume');
-
-        $destinationPath = base_path('assets/user_upload/resume');
-
-        if (!file_exists($destinationPath)) {
-            mkdir($destinationPath, 0777, true);
-        }
-
-        $fileName = time() . '_' . $file->getClientOriginalName();
-        $file->move($destinationPath, $fileName);
-
-        // Insert DB
-        $id = DB::table('resume_analyzer')->insertGetId([
-            'file_path' => 'assets/user_upload/resume/' . $fileName,
-            'original_filename' => $file->getClientOriginalName(),
-            'job_description' => $request->job_description,
-            'created_at' => now(),
-            'updated_at' => now(),
+    public function analyze_resume(Request $request){
+        $request->validate([
+            'resume' => 'required|mimes:pdf|max:5120',
+            'job_description' => 'required|string',
         ]);
 
-        // Run Python AI
-     //   $python = "C:\Users\John\AppData\Local\Programs\Python\Python314\python.exe";
-     //   $script = base_path('python/analyze_resume.py');
-    //    $command = "$python $script $id";
-        //echo $command;
+        if ($request->hasFile('resume')) {
 
-    //    exec($command);
+            $file = $request->file('resume');
 
-    $python = "C:\\Users\\John\\AppData\\Local\\Programs\\Python\\Python314\\python.exe";
-    $script = base_path('python/main.py'); // updated to main.py (your new structure)
+            $destinationPath = base_path('assets/user_upload/resume');
 
-    $id = (int) $id; // safety
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0777, true);
+            }
 
-    // Optional: log file to debug Python output
-    $logFile = storage_path('logs/python.log');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $file->move($destinationPath, $fileName);
 
-    // Full command (async + logging)
-    $command = "start /B \"\" \"$python\" \"$script\" $id > \"$logFile\" 2>&1";
-
-    // Execute async
-    pclose(popen($command, "r"));
-
-
-
-        
-
-        return back()->with('success', 'Resume uploaded and analyzed!');
+            // Insert DB
+            $id = DB::table('resume_analyzer')->insertGetId([
+                'file_path' => 'assets/user_upload/resume/' . $fileName,
+                'original_filename' => $file->getClientOriginalName(),
+                'job_description' => $request->job_description,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            $python = "C:\\Users\\John\\AppData\\Local\\Programs\\Python\\Python314\\python.exe";
+            $script = base_path('python/main.py'); // updated to main.py (your new structure)
+            $id = (int) $id;
+            $logFile = storage_path('logs/python.log');
+            $command = "start /B \"\" \"$python\" \"$script\" $id > \"$logFile\" 2>&1";
+            pclose(popen($command, "r"));
+            return back()->with('success', 'Resume uploaded and analyzed!');
+        }
+        return back()->with('error', 'No file uploaded.');
     }
-
-    return back()->with('error', 'No file uploaded.');
-}
 }
